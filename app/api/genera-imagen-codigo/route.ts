@@ -26,6 +26,7 @@ Return first the background hexadecimals, put a ||| separator, and then all the 
 Do not include markdown "\`\`\`" or "\`\`\`html" at the start or end.`
 
 
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -33,11 +34,14 @@ const openai = new OpenAI({
 export const runtime = 'edge';
 
 export async function POST(req: Request) {
-  const { url } = await req.json();
+  const { url, img } = await req.json()
+
+  const imageUrl = url ?? img
 
   const response = await openai.chat.completions.create({
     model: 'gpt-4-vision-preview',
     stream: true,
+    max_tokens: 4096,
     messages: [
       {
         role: 'system',
@@ -52,7 +56,7 @@ export async function POST(req: Request) {
           },
           {
             type: 'image_url',
-            image_url: url,
+            image_url: imageUrl,
           }
         ]
       }
